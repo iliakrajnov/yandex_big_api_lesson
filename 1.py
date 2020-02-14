@@ -135,7 +135,9 @@ q = 0
 mapp = button(q)
 button2()
 get_image(ll, spn, mapp, finded_place)
-address_to_out = toponym['metaDataProperty']['GeocoderMetaData']['text'])
+address_to_out = toponym['metaDataProperty']['GeocoderMetaData']['text']
+text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
+screen.blit(text, (250, 450))
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -172,6 +174,9 @@ while 1:
                 mapp = button(q)
                 button2()
                 get_image(ll, spn, mapp, finded_place)
+                address_to_out = toponym['metaDataProperty']['GeocoderMetaData']['text']
+                text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
+                screen.blit(text, (250, 450))
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
                 spn = mas_minus(spn)
