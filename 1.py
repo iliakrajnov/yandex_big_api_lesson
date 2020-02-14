@@ -135,6 +135,7 @@ q = 0
 mapp = button(q)
 button2()
 get_image(ll, spn, mapp, finded_place)
+address_to_out = toponym['metaDataProperty']['GeocoderMetaData']['text'])
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -147,7 +148,6 @@ while 1:
                 mapp = button(q)
                 get_image(ll, spn, mapp, finded_place)
             if y < 50 and x > 300:
-                print(2)
                 toponym_to_find = get_toponym()
                 geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
 
