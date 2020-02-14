@@ -46,6 +46,32 @@ def get_toponym():
         pygame.display.flip()
 
 
+def button():
+    global mapp
+    q = 0
+    pygame.draw.rect(screen, (0, 0, 255), (0, 0, 600, 50))
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = event.pos
+            if y > 50:
+                q += 1
+                q %= q
+                print(x, y)
+        if q == 0:
+            text = pygame.font.Font(None, 24).render("Карта", 1, (255, 255, 0))
+            screen.blit(text, (290, 15))
+            mapp = 'map'
+        elif q == 1:
+            text = pygame.font.Font(None, 24).render("Спутник", 1, (255, 255, 0))
+            screen.blit(text, (290, 15))
+            mapp = 'sat'
+        elif q == 2:
+            text = pygame.font.Font(None, 24).render("Гибрид", 1, (255, 255, 0))
+            screen.blit(text, (290, 15))
+            mapp = 'sat, skl'
+
+
+
 
 def mas_minus(spn):
     spn = spn.split(",")
@@ -60,7 +86,7 @@ def mas_plus(spn):
 
 
 def get_image(ll, spn):
-    map_params = {"ll": ll, "spn": spn, "l": "map"}
+    map_params = {"ll": ll, "spn": spn, "l": mapp}
     map_api_server = "http://static-maps.yandex.ru/1.x/"
     response = requests.get(map_api_server, params=map_params)
 
@@ -112,7 +138,9 @@ toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
 ]
 
 ll, spn = get_toponym_envelope(toponym)
+mapp = 'map'
 get_image(ll, spn)
+button()
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
