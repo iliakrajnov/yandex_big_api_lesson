@@ -6,11 +6,48 @@ from io import BytesIO
 from toponym_envelope import get_toponym_envelope
 
 
+def get_toponym():
+    screen.fill((0, 0, 0))
+    intro_text = ["Координаты: "]
+    title = pygame.font.Font(None, 120).render("Жду.", 1, pygame.Color("white"))
+    screen.blit(title, ((width - title.get_rect().width) // 2, 200))
+    font = pygame.font.Font(None, 30)
+    text_coord = 200 + title.get_rect().bottom
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color("white"))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = (width - string_rendered.get_rect().width) // 2
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+    name = ""
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                raise SystemExit
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return name
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+                else:
+                    name += chr(int(event.key))
+                    if len(name) > 20:
+                        name = name[:20]
+                title = pygame.font.Font(None, 50).render(
+                    name, 1, pygame.Color("white")
+                )
+                pygame.draw.rect(screen, (0, 0, 0), (0, 400, 10000, 400))
+                screen.blit(title, ((width - title.get_rect().width) // 2, 400))
+        pygame.display.flip()
+
+
 size = width, height = 600, 500
 screen = pygame.display.set_mode(size)
-
-
-toponym_to_find = "Москва, ул. Академика Королева 12"
+pygame.init()
+toponym_to_find = get_toponym()
 
 geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
 
