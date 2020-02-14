@@ -5,10 +5,11 @@ from PIL import Image
 from io import BytesIO
 from toponym_envelope import get_toponym_envelope
 
-
 def get_toponym():
     screen.fill((0, 0, 0))
-    intro_text = ["Координаты: "]
+    intro_text = [
+        "Координаты: ",
+    ]
     title = pygame.font.Font(None, 120).render("Жду.", 1, pygame.Color("white"))
     screen.blit(title, ((width - title.get_rect().width) // 2, 200))
     font = pygame.font.Font(None, 30)
@@ -41,9 +42,53 @@ def get_toponym():
                 )
                 pygame.draw.rect(screen, (0, 0, 0), (0, 400, 10000, 400))
                 screen.blit(title, ((width - title.get_rect().width) // 2, 400))
+
         pygame.display.flip()
 
 
+
+def mas_minus(spn):
+    spn = spn.split(",")
+    spn = ",".join([str(float(spn[0]) * 2), str(float(spn[1]) * 2)])
+    return spn
+
+
+def mas_plus(spn):
+    spn = spn.split(",")
+    spn = ",".join([str(float(spn[0]) / 2), str(float(spn[1]) / 2)])
+    return spn
+
+
+def get_image(ll, spn, finded_place):
+    map_params = {"ll": ll, "spn": spn, "l": "map", 'pt': finded_place}
+    map_api_server = "http://static-maps.yandex.ru/1.x/"
+    response = requests.get(map_api_server, params=map_params)
+
+    file = open("1.png", "wb")
+    file.write(response.content)
+    file.close()
+    screen.blit(pygame.image.load("1.png"), (0, 50))
+    pygame.display.flip()
+
+def up(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0])), str(float(ll[1]) * 1.00001)])
+    return ll
+
+def down(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0])), str(float(ll[1]) / 1.00001)])
+    return ll
+
+def left(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0]) / 1.00001), str(float(ll[1]))])
+    return ll
+
+def right(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0]) * 1.00001), str(float(ll[1]))])
+    return ll
 size = width, height = 600, 500
 screen = pygame.display.set_mode(size)
 pygame.init()
@@ -66,18 +111,32 @@ toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
     "GeoObject"
 ]
 
-
 ll, spn = get_toponym_envelope(toponym)
-map_params = {"ll": ll, "spn": spn, "l": "map"}
-map_api_server = "http://static-maps.yandex.ru/1.x/"
-response = requests.get(map_api_server, params=map_params)
-pygame.init()
-
-file = open("1.png", "wb")
-file.write(response.content)
-file.close()
-screen.blit(pygame.image.load("1.png"), (0, 50))
-pygame.display.flip()
-while pygame.event.wait().type != pygame.QUIT:
-    pass
+finded_place = ll + ',' + 'pmgnm'
+get_image(ll, spn, finded_place)
+while 1:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            raise SystemExit
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_PAGEUP:
+                spn = mas_minus(spn)
+                get_image(ll, spn, finded_place)
+            if event.key == pygame.K_PAGEDOWN:
+                spn = mas_plus(spn)
+                get_image(ll, spn, finded_place)
+            if event.key == pygame.K_UP:
+                ll = up(ll)
+                get_image(ll, spn, finded_place)
+            if event.key == pygame.K_DOWN:
+                ll = down(ll)
+                get_image(ll, spn, finded_place)
+            if event.key == pygame.K_RIGHT:
+                ll = right(ll)
+                get_image(ll, spn, finded_place)
+            if event.key == pygame.K_LEFT:
+                ll = left(ll)
+                get_image(ll, spn, finded_place)
+    pygame.display.flip()
 pygame.quit()
