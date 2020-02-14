@@ -3,7 +3,7 @@ import pygame
 import requests
 from PIL import Image
 from io import BytesIO
-from toponym_envelope import get_toponym_envelope
+import geocoder
 
 
 def get_toponym():
@@ -112,30 +112,14 @@ screen = pygame.display.set_mode(size)
 pygame.init()
 toponym_to_find = get_toponym()
 
-geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
 
-geocoder_params = {
-    "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
-    "geocode": toponym_to_find,
-    "format": "json",
-    }
-
-response = requests.get(geocoder_api_server, params=geocoder_params)
-
-if not response:
-    pass
-json_response = response.json()
-toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
-    "GeoObject"
-    ]
-
-ll, spn = get_toponym_envelope(toponym)
+ll, spn = geocoder.get_ll_span(toponym_to_find)
 finded_place = ll + "," + "pmgnm"
 q = 0
 mapp = button(q)
 button2()
 get_image(ll, spn, mapp, finded_place)
-address_to_out = toponym['metaDataProperty']['GeocoderMetaData']['text']
+address_to_out = geocoder.geocode(toponym_to_find)['metaDataProperty']['GeocoderMetaData']['text']
 text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
 screen.blit(text, (250, 450))
 while 1:
@@ -151,30 +135,13 @@ while 1:
                 get_image(ll, spn, mapp, finded_place)
             if y < 50 and x > 300:
                 toponym_to_find = get_toponym()
-                geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
-
-                geocoder_params = {
-                    "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
-                    "geocode": toponym_to_find,
-                    "format": "json",
-                }
-
-                response = requests.get(geocoder_api_server, params=geocoder_params)
-
-                if not response:
-                    pass
-                json_response = response.json()
-                toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
-                    "GeoObject"
-                ]
-
-                ll, spn = get_toponym_envelope(toponym)
+                ll, spn = geocoder.get_ll_span(toponym_to_find)
                 finded_place = ll + "," + "pmgnm"
                 q = 0
                 mapp = button(q)
                 button2()
                 get_image(ll, spn, mapp, finded_place)
-                address_to_out = toponym['metaDataProperty']['GeocoderMetaData']['text']
+                address_to_out = geocoder.geocode(toponym_to_find)['metaDataProperty']['GeocoderMetaData']['text']
                 text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
                 screen.blit(text, (250, 450))
         elif event.type == pygame.KEYDOWN:
