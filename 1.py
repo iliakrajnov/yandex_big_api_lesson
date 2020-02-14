@@ -10,20 +10,6 @@ size = width, height = 600, 500
 screen = pygame.display.set_mode(size)
 
 
-def gameover_screen():
-    screen.fill((0, 0, 0))
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                raise SystemExit
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    raise SystemExit
-
-        pygame.display.flip()
-
 toponym_to_find = "Москва, ул. Академика Королева 12"
 
 geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
@@ -40,7 +26,8 @@ if not response:
     pass
 json_response = response.json()
 toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
-    "GeoObject"]
+    "GeoObject"
+]
 
 
 ll, spn = get_toponym_envelope(toponym)
@@ -49,16 +36,11 @@ map_api_server = "http://static-maps.yandex.ru/1.x/"
 response = requests.get(map_api_server, params=map_params)
 pygame.init()
 
-file = open('1.png', 'wb')
+file = open("1.png", "wb")
 file.write(response.content)
 file.close()
-screen.blit(pygame.image.load('1.png'), (0, 50))
+screen.blit(pygame.image.load("1.png"), (0, 50))
 pygame.display.flip()
 while pygame.event.wait().type != pygame.QUIT:
     pass
 pygame.quit()
-
-
-
-
-
