@@ -70,6 +70,25 @@ def get_image(ll, spn):
     screen.blit(pygame.image.load("1.png"), (0, 50))
     pygame.display.flip()
 
+def up(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0])), str(float(ll[1]) * 1.00001)])
+    return ll
+
+def down(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0])), str(float(ll[1]) / 1.00001)])
+    return ll
+
+def left(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0]) / 1.00001), str(float(ll[1]))])
+    return ll
+
+def right(ll):
+    ll = ll.split(",")
+    ll = ",".join([str(float(ll[0]) * 1.00001), str(float(ll[1]))])
+    return ll
 size = width, height = 600, 500
 screen = pygame.display.set_mode(size)
 pygame.init()
@@ -105,6 +124,18 @@ while 1:
                 get_image(ll, spn)
             if event.key == pygame.K_PAGEDOWN:
                 spn = mas_plus(spn)
+                get_image(ll, spn)
+            if event.key == pygame.K_UP:
+                ll = up(ll)
+                get_image(ll, spn)
+            if event.key == pygame.K_DOWN:
+                ll = down(ll)
+                get_image(ll, spn)
+            if event.key == pygame.K_RIGHT:
+                ll = right(ll)
+                get_image(ll, spn)
+            if event.key == pygame.K_LEFT:
+                ll = left(ll)
                 get_image(ll, spn)
     pygame.display.flip()
 pygame.quit()
