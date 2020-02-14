@@ -45,12 +45,18 @@ def get_toponym():
 
 
 def button(q):
-    pygame.draw.rect(screen, (0, 0, 255), (0, 0, 600, 50))
+    pygame.draw.rect(screen, (0, 0, 255), (0, 0, 300, 50))
     data = ["map", "sat", "sat,skl", "sat,trf", "map,trf"]
     q %= len(data)
     text = pygame.font.Font(None, 24).render("Карта", 1, (255, 255, 0))
-    screen.blit(text, (290, 15))
+    screen.blit(text, (190, 15))
     return data[q]
+
+def button2():
+    pygame.draw.rect(screen, (0, 0, 200), (300, 0, 600, 50))
+    text = pygame.font.Font(None, 24).render("сброс", 1, (255, 255, 0))
+    screen.blit(text, (390, 15))
+
 
 
 def mas_minus(spn):
@@ -112,7 +118,7 @@ geocoder_params = {
     "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
     "geocode": toponym_to_find,
     "format": "json",
-}
+    }
 
 response = requests.get(geocoder_api_server, params=geocoder_params)
 
@@ -121,12 +127,13 @@ if not response:
 json_response = response.json()
 toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
     "GeoObject"
-]
+    ]
 
 ll, spn = get_toponym_envelope(toponym)
 finded_place = ll + "," + "pmgnm"
 q = 0
 mapp = button(q)
+button2()
 get_image(ll, spn, mapp, finded_place)
 while 1:
     for event in pygame.event.get():
@@ -135,9 +142,35 @@ while 1:
             raise SystemExit
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = event.pos
-            if y < 50:
+            if y < 50 and x < 300:
                 q += 1
                 mapp = button(q)
+                get_image(ll, spn, mapp, finded_place)
+            if y < 50 and x > 300:
+                print(2)
+                toponym_to_find = get_toponym()
+                geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
+
+                geocoder_params = {
+                    "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+                    "geocode": toponym_to_find,
+                    "format": "json",
+                }
+
+                response = requests.get(geocoder_api_server, params=geocoder_params)
+
+                if not response:
+                    pass
+                json_response = response.json()
+                toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
+                    "GeoObject"
+                ]
+
+                ll, spn = get_toponym_envelope(toponym)
+                finded_place = ll + "," + "pmgnm"
+                q = 0
+                mapp = button(q)
+                button2()
                 get_image(ll, spn, mapp, finded_place)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
