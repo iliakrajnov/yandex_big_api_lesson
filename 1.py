@@ -58,6 +58,14 @@ def button2():
     screen.blit(text, (390, 15))
 
 
+def button3(color, c):
+    pygame.draw.rect(screen, color, (600, 0, 650, 500))
+    if c == 't':
+        text = pygame.font.Font(None, 24).render("выкл.", 1, (0, 0, 0))
+    else:
+        text = pygame.font.Font(None, 24).render("вкл.", 1, (0, 0, 0))
+    screen.blit(text, (605, 250))
+
 
 def mas_minus(spn):
     spn = spn.split(",")
@@ -107,22 +115,20 @@ def right(ll):
     return ll
 
 
-size = width, height = 600, 500
+size = width, height = 650, 500
 screen = pygame.display.set_mode(size)
 pygame.init()
 toponym_to_find = get_toponym()
-
-
 ll, spn = geocoder.get_ll_span(toponym_to_find)
 finded_place = ll + "," + "pmgnm"
 q = 0
 mapp = button(q)
 button2()
+button3((255, 0, 0), 't')
+u = 0
 get_image(ll, spn, mapp, finded_place)
-address_to_out = geocoder.geocode(toponym_to_find)['metaDataProperty']['GeocoderMetaData']['text']
-text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
-screen.blit(text, (250, 450))
 while 1:
+    address_to_out = geocoder.geocode(toponym_to_find)['metaDataProperty']['GeocoderMetaData']['text']
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -133,7 +139,7 @@ while 1:
                 q += 1
                 mapp = button(q)
                 get_image(ll, spn, mapp, finded_place)
-            if y < 50 and x > 300:
+            if y < 50 and x > 300 and x < 600:
                 toponym_to_find = get_toponym()
                 ll, spn = geocoder.get_ll_span(toponym_to_find)
                 finded_place = ll + "," + "pmgnm"
@@ -141,9 +147,13 @@ while 1:
                 mapp = button(q)
                 button2()
                 get_image(ll, spn, mapp, finded_place)
-                address_to_out = geocoder.geocode(toponym_to_find)['metaDataProperty']['GeocoderMetaData']['text']
-                text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
-                screen.blit(text, (250, 450))
+
+            if x > 600:
+                u += 1
+                if u % 2 == 0:
+                    button3((255, 0, 0), 't')
+                else:
+                    button3((0, 255, 0), 'f')
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
                 spn = mas_minus(spn)
@@ -163,5 +173,17 @@ while 1:
             if event.key == pygame.K_LEFT:
                 ll = left(ll)
                 get_image(ll, spn, mapp)
+    coords = ', '.join(list(map(str, geocoder.get_coordinates(toponym_to_find))))
+    try:
+        postal = geocoder.geocode(coords)['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
+    except KeyError:
+        postal = 'Нет индекса'
+    if u % 2 == 0:
+        get_image(ll, spn, mapp, finded_place)
+        text = pygame.font.Font(None, 24).render(address_to_out, 1, (255, 0, 0))
+    else:
+        get_image(ll, spn, mapp, finded_place)
+        text = pygame.font.Font(None, 24).render(address_to_out + ' ' + postal, 1, (255, 0, 0))
+    screen.blit(text, (0, 450))
     pygame.display.flip()
 pygame.quit()
