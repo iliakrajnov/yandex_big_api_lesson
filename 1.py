@@ -155,13 +155,19 @@ while 1:
                 else:
                     button3((0, 255, 0), 'f')
             else:
-                pix_x = float(spn.split(',')[0]) / 600
+                pix_x =  -float(spn.split(',')[0]) / 600
                 pix_y = float(spn.split(',')[1]) / 450
-                print(pix_x, pi)
+                print(pix_x, pix_y)
                 zero = (300, 275)
-                print(ll)
-                print(float(ll.split(',')[0]) + (zero[0] - x) * pix_x, float(ll.split(',')[1]) + (zero[1] - y) * pix_y)
-                #print(geocoder.get_nearest_object((f_x + pix_x * x, f_y - pix_y * y), 'house'))
+                coords = [str(float(ll.split(',')[0]) + (zero[0] - x) * (pix_x) * 2), str(float(ll.split(',')[1]) + (zero[1] - y) * pix_y * 2)]
+                get_image(ll, spn, mapp, ','.join(coords) + ',pmgnm')
+                toponym_to_find = geocoder.get_nearest_object(coords, 'house')
+                ll, spn = geocoder.get_ll_span(toponym_to_find)
+                finded_place = ll + "," + "pmgnm"
+                q = 0
+                mapp = button(q)
+                button2()
+                button3((255, 0, 0), 't')
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_PAGEUP:
                 spn = mas_minus(spn)
