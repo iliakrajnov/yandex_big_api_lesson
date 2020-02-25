@@ -65,8 +65,12 @@ def mas_plus(spn):
     return spn
 
 
+
 def get_image(ll, spn, mapp):
     map_params = {"ll": ll, "spn": spn, "l": mapp}
+
+def get_image(ll, spn, mapp, finded_place):
+    map_params = {"ll": ll, "spn": spn, "l": mapp, "pt": finded_place}
     map_api_server = "http://static-maps.yandex.ru/1.x/"
     response = requests.get(map_api_server, params=map_params)
 
@@ -127,6 +131,10 @@ ll, spn = get_toponym_envelope(toponym)
 q = 0
 mapp = button(q)
 get_image(ll, spn, mapp)
+finded_place = ll + "," + "pmgnm"
+q = 0
+mapp = button(q)
+get_image(ll, spn, mapp, finded_place)
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -154,6 +162,23 @@ while 1:
             if event.key == pygame.K_RIGHT:
                 ll = right(ll)
                 get_image(ll, spn, mapp)
+                get_image(ll, spn, mapp, finded_place)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_PAGEUP:
+                spn = mas_minus(spn)
+                get_image(ll, spn, mapp, finded_place)
+            if event.key == pygame.K_PAGEDOWN:
+                spn = mas_plus(spn)
+                get_image(ll, spn, mapp, finded_place)
+            if event.key == pygame.K_UP:
+                ll = up(ll)
+                get_image(ll, spn, mapp, finded_place)
+            if event.key == pygame.K_DOWN:
+                ll = down(ll)
+                get_image(ll, spn, mapp, finded_place)
+            if event.key == pygame.K_RIGHT:
+                ll = right(ll)
+                get_image(ll, spn, mapp, finded_place)
             if event.key == pygame.K_LEFT:
                 ll = left(ll)
                 get_image(ll, spn, mapp)
