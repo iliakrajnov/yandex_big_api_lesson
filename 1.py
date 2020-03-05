@@ -3,6 +3,7 @@ import pygame
 import requests
 from PIL import Image
 from io import BytesIO
+from toponym_envelope import get_toponym_envelope
 import geocoder
 
 
@@ -45,6 +46,13 @@ def get_toponym():
 
 
 def button(q):
+    pygame.draw.rect(screen, (0, 0, 255), (0, 0, 600, 50))
+    data = ["map", "sat", "sat,skl", "sat,trf", "map,trf"]
+    q %= len(data)
+    text = pygame.font.Font(None, 24).render("Карта", 1, (255, 255, 0))
+    screen.blit(text, (290, 15))
+    return data[q]
+
     pygame.draw.rect(screen, (0, 0, 255), (0, 0, 300, 50))
     data = ["map", "sat", "sat,skl", "sat,trf", "map,trf"]
     q %= len(data)
@@ -78,6 +86,11 @@ def mas_plus(spn):
     spn = ",".join([str(float(spn[0]) / 2), str(float(spn[1]) / 2)])
     return spn
 
+
+
+
+def get_image(ll, spn, mapp):
+    map_params = {"ll": ll, "spn": spn, "l": mapp}
 
 def get_image(ll, spn, mapp, finded_place):
     map_params = {"ll": ll, "spn": spn, "l": mapp, "pt": finded_place}
@@ -115,6 +128,38 @@ def right(ll):
     return ll
 
 
+size = width, height = 600, 500
+screen = pygame.display.set_mode(size)
+pygame.init()
+toponym_to_find = get_toponym()
+
+geocoder_api_server = "http://geocode-maps.yandex.ru/1.x/"
+
+geocoder_params = {
+    "apikey": "40d1649f-0493-4b70-98ba-98533de7710b",
+    "geocode": toponym_to_find,
+    "format": "json",
+}
+
+response = requests.get(geocoder_api_server, params=geocoder_params)
+
+if not response:
+    pass
+json_response = response.json()
+toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0][
+    "GeoObject"
+]
+
+ll, spn = get_toponym_envelope(toponym)
+q = 0
+mapp = button(q)
+get_image(ll, spn, mapp)
+finded_place = ll + "," + "pmgnm"
+q = 0
+mapp = button(q)
+get_image(ll, spn, mapp, finded_place)
+while 1:
+
 size = width, height = 650, 500
 screen = pygame.display.set_mode(size)
 pygame.init()
@@ -135,6 +180,28 @@ while 1:
             raise SystemExit
         elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = event.pos
+
+            if y < 50:
+                q += 1
+                mapp = button(q)
+                get_image(ll, spn, mapp)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_PAGEUP:
+                spn = mas_minus(spn)
+                get_image(ll, spn, mapp)
+            if event.key == pygame.K_PAGEDOWN:
+                spn = mas_plus(spn)
+                get_image(ll, spn, mapp)
+            if event.key == pygame.K_UP:
+                ll = up(ll)
+                get_image(ll, spn, mapp)
+            if event.key == pygame.K_DOWN:
+                ll = down(ll)
+                get_image(ll, spn, mapp)
+            if event.key == pygame.K_RIGHT:
+                ll = right(ll)
+                get_image(ll, spn, mapp)
+                get_image(ll, spn, mapp, finded_place)
             if y < 50 and x < 300:
                 q += 1
                 mapp = button(q)
@@ -186,7 +253,6 @@ while 1:
         text = pygame.font.Font(None, 24).render(address_to_out + ' ' + postal, 1, (255, 0, 0))
     screen.blit(text, (0, 450))
     pygame.display.flip()
-=======
 import os
 import pygame
 import requests
@@ -376,6 +442,8 @@ while 1:
             if event.key == pygame.K_LEFT:
                 ll = left(ll)
                 get_image(ll, spn, mapp)
+    pygame.display.flip()
+pygame.quit()
     coords = ', '.join(list(map(str, geocoder.get_coordinates(toponym_to_find))))
     try:
         postal = geocoder.geocode(coords)['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']
